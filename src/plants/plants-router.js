@@ -1,8 +1,9 @@
 const express = require('express')
 const PlantsService = require('./plants-service')
-//const { requireAuth } = require('../../middleware/jwt-auth')
+const { requireAuth } = require('../../middleware/jwt-auth')
 
 const plantsRouter = express.Router()
+const jsonBodyParser = express.json()
 
 plantsRouter
   .route('/')
@@ -13,6 +14,30 @@ plantsRouter
       })
       .catch(next)
   })
+  
+  .post(requireAuth, jsonBodyParser, (req, res, next) => {
+    const { name, type, description, sunlight, water, fertilize, repot, image } = req.body
+    const newPlant = { name, type, description, sunlight, water, fertilize, repot, image }
+
+    for (const [key, value] of Object.entries(newPlant))
+      if (value == null)
+        return res.status(400).json({
+          error: `Missing '${key}' in request body`
+        })
+    newPlant.user_id = req.user.id
+
+    PlantsService.insertPlant(
+      req.app.get('db'),
+      newPlant
+    )
+      .then(plant => {
+        res
+          .status(201)
+          //.location(path.posix.join(req.originalUrl, `/${plant.id}`))
+          .json(PlantsService.serializeThing(plant))
+      })
+      .catch(next)
+    })
 /*
 plantsRouter
   .route('/:plant_id')

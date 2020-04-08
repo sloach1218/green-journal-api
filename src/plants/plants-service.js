@@ -19,6 +19,11 @@ const PlantsService = {
       )
       
   },
+  getById(db, id) {
+    return PlantsService.getAllThings(db)
+      .where('plant.id', id)
+      .first()
+  },
 
   
 
@@ -46,6 +51,14 @@ const PlantsService = {
       date_created: plantData.date_created,
       image: plantData.image,
     }
+  },
+  insertPlant(db, newPlant) {
+    return db
+      .insert(newPlant)
+      .into('gj_plants')
+      .returning('*')
+      .then(([plant]) => plant)
+      
   },
 
   
