@@ -6,7 +6,7 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const authRouter = require('../auth/auth-router')
 const plantsRouter = require('./plants/plants-router')
-//const usersRouter = require('./users/users-router')
+const usersRouter = require('./users/users-router')
 
 const app = express()
 
@@ -17,7 +17,7 @@ app.use(cors())
 app.use(helmet())
 
 app.use('/api/auth', authRouter)
-//app.use('/api/users', usersRouter)
+app.use('/api/users', usersRouter)
 app.use('/api/plants', plantsRouter)
 
 
