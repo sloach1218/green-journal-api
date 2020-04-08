@@ -1,0 +1,4 @@
+ALTER TABLE gj_plants
+  DROP COLUMN IF EXISTS user_id;
+
+DROP TABLE IF EXISTS gj_users CASCADE;

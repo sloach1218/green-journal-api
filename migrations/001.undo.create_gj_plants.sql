@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS gj_plants CASCADE;
