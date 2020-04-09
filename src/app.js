@@ -8,6 +8,8 @@ const authRouter = require('../auth/auth-router')
 const plantsRouter = require('./plants/plants-router')
 const usersRouter = require('./users/users-router')
 
+const imageUploadRouter = require('./image-uploader/image-upload-router')
+
 const app = express()
 
 app.use(morgan((NODE_ENV === 'production') ? 'tiny' : 'common', {
@@ -15,6 +17,8 @@ app.use(morgan((NODE_ENV === 'production') ? 'tiny' : 'common', {
 }))
 app.use(cors())
 app.use(helmet())
+
+app.use('/api', imageUploadRouter)
 
 app.use('/api/auth', authRouter)
 app.use('/api/users', usersRouter)
