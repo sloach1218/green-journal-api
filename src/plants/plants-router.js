@@ -7,10 +7,11 @@ const jsonBodyParser = express.json()
 
 plantsRouter
   .route('/')
-  .get((req, res, next) => {
-    PlantsService.getAllThings(req.app.get('db'))
+  //.all(requireAuth)
+  .get(requireAuth, (req, res, next) => {
+    PlantsService.getByUserId(req.app.get('db'), req.user.id)
       .then(plants => {
-        res.json(PlantsService.serializeThings(plants))
+        res.json(PlantsService.serializePlants(plants))
       })
       .catch(next)
   })

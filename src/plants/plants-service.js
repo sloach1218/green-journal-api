@@ -2,7 +2,7 @@ const xss = require('xss')
 const Treeize = require('treeize')
 
 const PlantsService = {
-  getAllThings(db) {
+  getAllPlants(db) {
     return db
       .from('gj_plants AS plant')
       .select(
@@ -20,18 +20,23 @@ const PlantsService = {
       
   },
   getById(db, id) {
-    return PlantsService.getAllThings(db)
+    return PlantsService.getAllPlants(db)
       .where('plant.id', id)
       .first()
+  },
+  getByUserId(db, userId){
+    return PlantsService.getAllPlants(db)
+      .where('plant.user_id', userId)
+      
   },
 
   
 
-  serializeThings(plants) {
-    return plants.map(this.serializeThing)
+  serializePlants(plants) {
+    return plants.map(this.serializePlant)
   },
 
-  serializeThing(plant) {
+  serializePlant(plant) {
     const plantTree = new Treeize()
 
     // Some light hackiness to allow for the fact that `treeize`
