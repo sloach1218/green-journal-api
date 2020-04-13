@@ -8,7 +8,9 @@ describe('Plants Endpoints', function() {
   const {
     testUsers,
     testPlants,
-  } = helpers.makeThingsFixtures()
+  } = helpers.makePlantsFixtures()
+
+  const validUser = testUsers[0];
 
   before('make knex instance', () => {
     db = knex({
@@ -17,7 +19,7 @@ describe('Plants Endpoints', function() {
     })
     app.set('db', db)
   })
-
+  
   after('disconnect from db', () => db.destroy())
 
   before('cleanup', () => helpers.cleanTables(db))
@@ -25,10 +27,25 @@ describe('Plants Endpoints', function() {
   afterEach('cleanup', () => helpers.cleanTables(db))
 
   describe(`GET /api/plants`, () => {
+    context(`Given no authorization`, () => {
+      it(`responds with 401 unauthorized`, () => {
+        return supertest(app)
+          .get('/api/plants')
+          .expect(401)
+      })
+    })
+    
     context(`Given no plants`, () => {
+      beforeEach('insert users', () =>
+        helpers.seedUsersTables(
+          db,
+          testUsers
+        )
+      )
       it(`responds with 200 and an empty list`, () => {
         return supertest(app)
           .get('/api/plants')
+          .set('Authorization', helpers.makeAuthHeader(validUser))
           .expect(200, [])
       })
     })
@@ -42,137 +59,126 @@ describe('Plants Endpoints', function() {
         )
       )
 
-      it('responds with 200 and all of the plants', () => {
+      it('responds with 200 and plants of specified user', () => {
+        
         const expectedPlants = testPlants.map(plant =>
           helpers.makeExpectedPlant(
             testUsers,
             plant
           )
         )
+        function isUser(plant){
+          return plant.user === validUser.id;
+        }
+
+        const finalPlants = expectedPlants.filter(isUser);
+
+
         return supertest(app)
           .get('/api/plants')
-          .expect(200, expectedPlants)
+          .set('Authorization', helpers.makeAuthHeader(validUser))
+          .expect(200, finalPlants)
       })
     })
-/*
+
     context(`Given an XSS attack thing`, () => {
-      const testUser = helpers.makeUsersArray()[1]
+      
+      
+      const testUser = testUsers[0]
       const {
-        maliciousThing,
-        expectedThing,
-      } = helpers.makeMaliciousThing(testUser)
+        maliciousPlant,
+        expectedPlant,
+      } = helpers.makeMaliciousPlant(testUser)
 
       beforeEach('insert malicious thing', () => {
-        return helpers.seedMaliciousThing(
+        return helpers.seedMaliciousPlant(
           db,
           testUser,
-          maliciousThing,
+          maliciousPlant,
         )
       })
 
       it('removes XSS attack content', () => {
         return supertest(app)
-          .get(`/api/things`)
+          .get(`/api/plants`)
+          .set('Authorization', helpers.makeAuthHeader(validUser))
           .expect(200)
           .expect(res => {
-            expect(res.body[0].title).to.eql(expectedThing.title)
-            expect(res.body[0].content).to.eql(expectedThing.content)
-          })
-      })
-    })*/
-  })
-/*
-  describe(`GET /api/things/:thing_id`, () => {
-    context(`Given no things`, () => {
-      it(`responds with 404`, () => {
-        const thingId = 123456
-        return supertest(app)
-          .get(`/api/things/${thingId}`)
-          .expect(404, { error: `Thing doesn't exist` })
-      })
-    })
-
-    context('Given there are things in the database', () => {
-      beforeEach('insert things', () =>
-        helpers.seedThingsTables(
-          db,
-          testUsers,
-          testThings,
-          testReviews,
-        )
-      )
-
-      it('responds with 200 and the specified thing', () => {
-        const thingId = 2
-        const expectedThing = helpers.makeExpectedThing(
-          testUsers,
-          testThings[thingId - 1],
-          testReviews,
-        )
-
-        return supertest(app)
-          .get(`/api/things/${thingId}`)
-          .expect(200, expectedThing)
-      })
-    })
-
-    context(`Given an XSS attack thing`, () => {
-      const testUser = helpers.makeUsersArray()[1]
-      const {
-        maliciousThing,
-        expectedThing,
-      } = helpers.makeMaliciousThing(testUser)
-
-      beforeEach('insert malicious thing', () => {
-        return helpers.seedMaliciousThing(
-          db,
-          testUser,
-          maliciousThing,
-        )
-      })
-
-      it('removes XSS attack content', () => {
-        return supertest(app)
-          .get(`/api/things/${maliciousThing.id}`)
-          .expect(200)
-          .expect(res => {
-            expect(res.body.title).to.eql(expectedThing.title)
-            expect(res.body.content).to.eql(expectedThing.content)
+            expect(res.body[0].name).to.eql(expectedPlant.name)
+            expect(res.body[0].description).to.eql(expectedPlant.description)
           })
       })
     })
   })
+  describe(`POST /api/plants`, () => {
+    
 
-  describe(`GET /api/things/:thing_id/reviews`, () => {
-    context(`Given no things`, () => {
-      it(`responds with 404`, () => {
-        const thingId = 123456
-        return supertest(app)
-          .get(`/api/things/${thingId}/reviews`)
-          .expect(404, { error: `Thing doesn't exist` })
-      })
-    })
-
-    context('Given there are reviews for thing in the database', () => {
-      beforeEach('insert things', () =>
-        helpers.seedThingsTables(
+    beforeEach('insert users', () =>
+        helpers.seedUsersTables(
           db,
-          testUsers,
-          testThings,
-          testReviews,
+          testUsers
         )
       )
 
-      it('responds with 200 and the specified reviews', () => {
-        const thingId = 1
-        const expectedReviews = helpers.makeExpectedThingReviews(
-          testUsers, thingId, testReviews
-        )
+    it(`creates a plant, responding with 201 and the new plant`, function() {
+      this.retries(3)
+      
+      const newPlant = {
+        name: 'Planty',
+        type: 'plant',
+        description: 'likes water and sun, but not too much',
+        sunlight: 'Bright',
+        water: 6,
+        fertilize: 4,
+        repot: 12,
+        image: 'plant.jpg',
+
+      }
+      
+      return supertest(app)
+        .post('/api/plants')
+        .set('Authorization', helpers.makeAuthHeader(validUser))
+        .send(newPlant)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.name).to.eql(newPlant.name)
+          expect(res.body.type).to.eql(newPlant.type)
+          expect(res.body.description).to.eql(newPlant.description)
+          expect(res.body.sunlight).to.eql(newPlant.sunlight)
+          expect(res.body.water).to.eql(newPlant.water)
+          expect(res.body.fertilize).to.eql(newPlant.fertilize)
+          expect(res.body.water).to.eql(newPlant.water)
+          expect(res.body.image).to.eql(newPlant.image)
+          expect(res.body).to.have.property('id')
+        })
+    })
+
+    const requiredFields = ['name', 'type', 'description', 'sunlight', 'water', 'fertilize', 'repot', 'image']
+
+    requiredFields.forEach(field => {
+      
+      const newPlant = {
+        name: 'Planty',
+        type: 'plantlike',
+        description: 'likes water and sun, but not too much',
+        sunlight: 'Bright',
+        water: 6,
+        fertilize: 4,
+        repot: 12,
+        image: 'plant.jpg',
+      }
+
+      it(`responds with 400 and an error message when the '${field}' is missing`, () => {
+        delete newPlant[field]
 
         return supertest(app)
-          .get(`/api/things/${thingId}/reviews`)
-          .expect(200, expectedReviews)
+          .post('/api/plants')
+          .set('Authorization', helpers.makeAuthHeader(validUser))
+          .send(newPlant)
+          .expect(400, {
+            error: `Missing '${field}' in request body`,
+          })
       })
     })
-  })*/
+  })
 }) 

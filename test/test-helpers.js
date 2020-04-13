@@ -1,33 +1,37 @@
+const jwt = require('jsonwebtoken')
+const config = require('../src/config')
+
+
 function makeUsersArray() {
   return [
     {
       id: 1,
       user_name: 'test-user-1',
-      password: 'password',
+      password: 'password1!',
       date_created: '2029-01-22T16:28:32.615Z',
     },
     {
       id: 2,
       user_name: 'test-user-2',
-      password: 'password',
+      password: 'password2',
       date_created: '2029-01-22T16:28:32.615Z',
     },
     {
       id: 3,
       user_name: 'test-user-3',
-      password: 'password',
+      password: 'password3',
       date_created: '2029-01-22T16:28:32.615Z',
     },
     {
       id: 4,
       user_name: 'test-user-4',
-      password: 'password',
+      password: 'password4',
       date_created: '2029-01-22T16:28:32.615Z',
     },
   ]
 }
 
-function makeThingsArray(users) {
+function makePlantsArray(users) {
   return [
     {
       id: 1,
@@ -100,8 +104,9 @@ function makeExpectedPlant(users, plant) {
     fertilize: plant.fertilize,
     repot: plant.repot,
     image: plant.image,
-    date_created: plant.date_created,
     user: user.id,
+    date_created: plant.date_created,
+    
   }
 }
 
@@ -109,30 +114,35 @@ function makeExpectedPlant(users, plant) {
 
 
 
-function makeMaliciousThing(user) {
-  const maliciousThing = {
+function makeMaliciousPlant(user) {
+  const maliciousPlant = {
     id: 911,
     image: 'http://placehold.it/500x500',
     date_created: new Date().toISOString(),
-    title: 'Naughty naughty very naughty <script>alert("xss");</script>',
+    type: 'bad plant',
+    sunlight: 'none',
+    water:'234',
+    repot:'234',
+    fertilize:'234',
+    name: 'Naughty naughty very naughty <script>alert("xss");</script>',
     user_id: user.id,
-    content: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
+    description: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
   }
-  const expectedThing = {
-    ...makeExpectedThing([user], maliciousThing),
-    title: 'Naughty naughty very naughty &lt;script&gt;alert(\"xss\");&lt;/script&gt;',
-    content: `Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.`,
+  const expectedPlant = {
+    ...makeExpectedPlant([user], maliciousPlant),
+    name: 'Naughty naughty very naughty &lt;script&gt;alert(\"xss\");&lt;/script&gt;',
+    description: `Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.`,
   }
   return {
-    maliciousThing,
-    expectedThing,
+    maliciousPlant,
+    expectedPlant,
   }
 }
 
-function makeThingsFixtures() {
+function makePlantsFixtures() {
   const testUsers = makeUsersArray()
-  const testPlants = makeThingsArray(testUsers)
-  return {  testPlants, testUsers }
+  const testPlants = makePlantsArray(testUsers)
+  return { testPlants, testUsers }
 }
 
 function cleanTables(db) {
@@ -155,32 +165,43 @@ function seedPlantsTables(db, users, plants) {
     )
    
 }
-
-function seedMaliciousThing(db, user, thing) {
+function seedUsersTables(db, users) {
   return db
-    .into('thingful_users')
+    .into('gj_users')
+    .insert(users)
+   
+}
+
+function seedMaliciousPlant(db, user, plant) {
+  return db
+    .into('gj_users')
     .insert([user])
     .then(() =>
       db
-        .into('thingful_things')
-        .insert([thing])
+        .into('gj_plants')
+        .insert([plant])
     )
 }
 
-function makeAuthHeader(user){
-  const token = Buffer.from(`${user.user_name}:${user.password}`).toString('base64')
-  return `Basic ${token}`
+
+function makeAuthHeader(user, secret = config.JWT_SECRET){
+  const token = jwt.sign({ user_id:user.id}, secret, {
+    subject: user.user_name,
+    algorithm: 'HS256',
+  })
+  return `Bearer ${token}`
 }
 
 module.exports = {
   makeUsersArray,
-  makeThingsArray,
+  makePlantsArray,
   makeExpectedPlant,
-  makeMaliciousThing,
+  makeMaliciousPlant,
 
-  makeThingsFixtures,
+  makePlantsFixtures,
   cleanTables,
   seedPlantsTables,
-  seedMaliciousThing,
+  seedUsersTables,
+  seedMaliciousPlant,
   makeAuthHeader,
 }

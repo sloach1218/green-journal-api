@@ -7,7 +7,6 @@ const jsonBodyParser = express.json()
 
 plantsRouter
   .route('/')
-  //.all(requireAuth)
   .get(requireAuth, (req, res, next) => {
     PlantsService.getByUserId(req.app.get('db'), req.user.id)
       .then(plants => {
@@ -35,7 +34,7 @@ plantsRouter
         res
           .status(201)
           //.location(path.posix.join(req.originalUrl, `/${plant.id}`))
-          .json(PlantsService.serializeThing(plant))
+          .json(PlantsService.serializePlant(plant))
       })
       .catch(next)
     })

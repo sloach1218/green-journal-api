@@ -16,6 +16,8 @@ const PlantsService = {
         'plant.fertilize',
         'plant.repot',
         'plant.date_created',
+        'plant.user_id',
+
       )
       
   },
@@ -55,6 +57,7 @@ const PlantsService = {
       repot: plantData.repot,
       date_created: plantData.date_created,
       image: plantData.image,
+      user: plantData.user_id,
     }
   },
   insertPlant(db, newPlant) {
