@@ -68,6 +68,12 @@ const PlantsService = {
       .then(([plant]) => plant)
       
   },
+  updatePlant(db, id, newPlantFields){
+    return db
+        .into('gj_plants')
+        .where({id})
+        .update(newPlantFields)
+  }
 
   
 }

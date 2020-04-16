@@ -181,4 +181,66 @@ describe('Plants Endpoints', function() {
       })
     })
   })
+  describe(`PATCH /api/plants`, () => {
+    context(`Given no plants`, () => {
+      beforeEach('insert users', () =>
+        helpers.seedUsersTables(
+          db,
+          testUsers
+        )
+      )
+      it(`responds with 400`, () => {
+        return supertest(app)
+          .patch(`/api/plants`)
+          .set('Authorization', helpers.makeAuthHeader(validUser))
+          .expect(400, { error: { message: `Request body must contain either name, type, description, sunlight, water, fertilize, repot, image` } })
+      })
+    })
+
+    context('Given there are plants in the database', () => {
+
+      beforeEach('insert plants', () =>
+        helpers.seedPlantsTables(
+          db,
+          testUsers,
+          testPlants
+        )
+      )
+      it(`responds with 400 when no required fields supplied`, () => {
+        
+        return supertest(app)
+          .patch(`/api/plants`)
+          .set('Authorization', helpers.makeAuthHeader(validUser))
+          .send({ irrelevantField: 'foo' })
+          .expect(400, {
+            error: {
+              message: `Request body must contain either name, type, description, sunlight, water, fertilize, repot, image`
+            }
+          })
+      })
+
+      it('responds with 204 and updates the plant', () => {
+        const updatePlant = {
+          name: 'updated plant name',
+          description: 'updated plant description',
+          sunlight: 'Bright',
+          water: 7,
+          fertilize: 2,
+          repot: 12,
+          image: 'http://placehold.it/500x500',
+          id: 2,
+        }
+
+        return supertest(app)
+          .patch(`/api/plants`)
+          .set('Authorization', helpers.makeAuthHeader(validUser))
+          .send(updatePlant)
+          .expect(204)
+          
+      }) 
+
+      
+
+    })
+  })
 }) 

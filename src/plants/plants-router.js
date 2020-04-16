@@ -38,14 +38,38 @@ plantsRouter
       })
       .catch(next)
     })
-/*
+
+    .patch(requireAuth, jsonBodyParser, (req, res, next) => {
+      const { name, type, description, sunlight, water, fertilize, repot, image } = req.body
+      const plantToUpdate = { name, type, description, sunlight, water, fertilize, repot, image }
+      
+      const numberOfValues = Object.values(plantToUpdate).filter(Boolean).length
+      if (numberOfValues === 0) {
+        return res.status(400).json({
+          error: {
+            message: `Request body must contain either name, type, description, sunlight, water, fertilize, repot, image`
+          }
+        })
+      }
+    
+      PlantsService.updatePlant(
+        req.app.get('db'),
+        req.body.id,
+        plantToUpdate
+      )
+        .then(numRowsAffected => {
+          res.status(204).end()
+        })
+        .catch(next)
+    })
+
 plantsRouter
   .route('/:plant_id')
   .all(requireAuth)
-  .all(checkThingExists)
+  .all(checkPlantExists)
   .get((req, res) => {
-    res.json(PlantsService.serializeThing(res.thing))
-  }) */
+    res.json(PlantsService.serializePlant(res.plant))
+  }) 
 
 /*
 plantsRouter.route('/:plant_id/logs/')
@@ -63,23 +87,23 @@ plantsRouter.route('/:plant_id/logs/')
   }) */
 
 /* async/await syntax for promises */
-/*async function checkThingExists(req, res, next) {
+async function checkPlantExists(req, res, next) {
   try {
-    const thing = await PlantsService.getById(
+    const plant = await PlantsService.getById(
       req.app.get('db'),
-      req.params.thing_id
+      req.params.plant_id
     )
 
-    if (!thing)
+    if (!plant)
       return res.status(404).json({
-        error: `Thing doesn't exist`
+        error: `Plant doesn't exist`
       })
 
-    res.thing = thing
+    res.plant = plant
     next()
   } catch (error) {
     next(error)
   }
-}*/
+}
 
 module.exports = plantsRouter
