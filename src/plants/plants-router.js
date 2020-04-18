@@ -62,7 +62,21 @@ plantsRouter
         })
         .catch(next)
     })
-    
+    .delete(requireAuth, jsonBodyParser, (req, res, next) => {
+      const { plant_id } = req.body
+      PlantsService.deletePlant(
+        req.app.get('db'),
+        plant_id
+      )
+        .then( PlantsService.deletePlantLogs(
+          req.app.get('db'),
+          plant_id
+        ))
+        .then(numRowsAffected => {
+          res.status(204).end()
+        })
+        .catch(next)
+    })
 
   
   

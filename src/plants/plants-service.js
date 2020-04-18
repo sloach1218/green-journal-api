@@ -74,6 +74,18 @@ const PlantsService = {
         .where({id})
         .update(newPlantFields)
   },
+  deletePlant(db, id){
+    return db
+        .from('gj_plants')
+        .where({id})
+        .delete()
+  },
+  deletePlantLogs(db, plant_id){
+    return db
+        .from('gj_logs')
+        .where({plant_id})
+        .delete()
+  },
   getLogsForPlant(db, plant_id) {
     return db
       .from('gj_logs AS log')

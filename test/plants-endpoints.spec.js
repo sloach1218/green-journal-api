@@ -243,4 +243,27 @@ describe('Plants Endpoints', function() {
 
     })
   })
+  describe('DELETE /api/plants', () => {
+
+    context('Given there are plants in the database', () => {
+
+      beforeEach('insert plants', () => {
+        helpers.seedPlantsTables(
+          db,
+          testUsers,
+          testPlants
+        )
+      })
+
+      it('removes the plant by ID from the store', () => {
+        const idToRemove = {plant_id:2}
+        return supertest(app)
+          .delete(`/api/plants`)
+          .send(idToRemove)
+          .set('Authorization', helpers.makeAuthHeader(validUser))
+          .expect(204)
+          
+      })
+    })
+  })
 }) 

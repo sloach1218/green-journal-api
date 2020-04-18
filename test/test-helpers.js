@@ -56,7 +56,7 @@ function makePlantsArray(users) {
       fertilize: 2,
       repot: 12,
       image: 'http://placehold.it/500x500',
-      user_id: users[1].id,
+      user_id: users[0].id,
       date_created: '2029-01-22T16:28:32.615Z',
     },
     {
@@ -82,7 +82,44 @@ function makePlantsArray(users) {
       fertilize: 2,
       repot: 12,
       image: 'http://placehold.it/500x500',
+      user_id: users[1].id,
+      date_created: '2029-01-22T16:28:32.615Z',
+    },
+  ]
+}
+
+function makeLogsArray(users, plants) {
+  return [
+    {
+      id: 1,
+      text: 'test-log-1',
+      image: 'http://placehold.it/500x500',
+      plant_id: plants[2].id,
+      user_id: users[1].id,
+      date_created: '2029-01-22T16:28:32.615Z',
+    },
+    {
+      id: 2,
+      text: 'test-log-2',
+      image: 'http://placehold.it/500x500',
+      plant_id: plants[0].id,
       user_id: users[0].id,
+      date_created: '2029-01-22T16:28:32.615Z',
+    },
+    {
+      id: 3,
+      text: 'test-log-3',
+      image: 'http://placehold.it/500x500',
+      plant_id: 1,
+      user_id: plants[1].id,
+      date_created: '2029-01-22T16:28:32.615Z',
+    },
+    {
+      id: 4,
+      text: 'test-log-4',
+      image: 'http://placehold.it/500x500',
+      plant_id: plants[1].id,
+      user_id: users[1].id,
       date_created: '2029-01-22T16:28:32.615Z',
     },
   ]
@@ -106,6 +143,23 @@ function makeExpectedPlant(users, plant) {
     image: plant.image,
     user: user.id,
     date_created: plant.date_created,
+    
+  }
+}
+
+function makeExpectedLog(users, plants, log) {
+  const user = users
+    .find(user => user.id === log.user_id)
+
+  const plant = plants
+    .find(plant => plant.id === log.plant_id)
+
+  return {
+    id: log.id,
+    text: log.text,
+    plant: plant.id,
+    user: user.id,
+    date_created: log.date_created,
     
   }
 }
@@ -145,13 +199,39 @@ function makePlantsFixtures() {
   return { testPlants, testUsers }
 }
 
+function makeLogsFixtures() {
+  const testUsers = makeUsersArray()
+  const testPlants = makePlantsArray(testUsers)
+  const testLogs = makeLogsArray(testPlants, testUsers)
+  console.log(testLogs)
+  return { testLogs, testPlants, testUsers }
+}
+
 function cleanTables(db) {
   return db.raw(
     `TRUNCATE
+      gj_logs,
       gj_plants,
       gj_users
       RESTART IDENTITY CASCADE`
   )
+}
+
+function seedLogsTables(db, users, plants, logs) {
+  return db
+    .into('gj_users')
+    .insert(users)
+    .then(() =>
+      db
+        .into('gj_plants')
+        .insert(plants)
+    )
+    .then(() =>
+      db
+        .into('gj_logs')
+        .insert(logs)
+    )
+   
 }
 
 function seedPlantsTables(db, users, plants) {
@@ -197,9 +277,12 @@ module.exports = {
   makePlantsArray,
   makeExpectedPlant,
   makeMaliciousPlant,
+  makeLogsFixtures,
+  makeExpectedLog,
 
   makePlantsFixtures,
   cleanTables,
+  seedLogsTables,
   seedPlantsTables,
   seedUsersTables,
   seedMaliciousPlant,
