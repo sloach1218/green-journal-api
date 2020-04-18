@@ -1,6 +1,7 @@
 BEGIN;
 
 TRUNCATE
+  gj_logs,
   gj_plants,
   gj_users
   RESTART IDENTITY CASCADE;
@@ -15,6 +16,44 @@ INSERT INTO gj_plants (name, type, description, sunlight, water, fertilize, repo
 VALUES
   ('Brom', 'bromeliad', 'Will produce pups that can be pulled off to grow new plants.', 'bright', 7, 4, 12, 'https://live.staticflickr.com/65535/48245873492_100da3b527_b.jpg', 1),
   ('Peter Parker', 'spider plant', 'Super easy to grow and propagate. Darker color when in the sun more.', 'low', 6, 2, 6, 'https://live.staticflickr.com/65535/48245873492_100da3b527_b.jpg', 2),
-  ('Palmy', 'parlor palm', 'Likes humidity.', 'bright', 9, 6, 12, 'https://live.staticflickr.com/65535/48245873492_100da3b527_b.jpg', 3);
+  ('Palmy', 'parlor palm', 'Likes humidity.', 'bright', 9, 6, 12, 'https://live.staticflickr.com/65535/48245873492_100da3b527_b.jpg', 2);
+
+
+INSERT INTO gj_logs (
+  text,
+  image,
+  plant_id,
+  user_id
+) VALUES
+  (
+    'Growing so fast already!',
+    'https://live.staticflickr.com/65535/48245873492_100da3b527_b.jpg',
+    2,
+    2
+  ),
+  (
+    'Bloomed today!',
+    'https://live.staticflickr.com/65535/48245873492_100da3b527_b.jpg',
+    2,
+    2
+  ),
+  (
+    'New leaf popped out.',
+    'https://live.staticflickr.com/65535/48245873492_100da3b527_b.jpg',
+    3,
+    2
+  ),
+  (
+    'Took some cuttings to propagate',
+    'https://live.staticflickr.com/65535/48245873492_100da3b527_b.jpg',
+    2,
+    2
+  ),
+  (
+    'This plant is amazing.',
+    'https://live.staticflickr.com/65535/48245873492_100da3b527_b.jpg',
+    3,
+    2
+  );
 
 COMMIT;

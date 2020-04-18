@@ -73,10 +73,54 @@ const PlantsService = {
         .into('gj_plants')
         .where({id})
         .update(newPlantFields)
-  }
+  },
+  getLogsForPlant(db, plant_id) {
+    return db
+      .from('gj_logs AS log')
+      .select(
+        'log.id',
+        'log.image',
+        'log.text',
+        'log.date_created',
+        ...userFields,
+      )
+      .where('log.plant_id', plant_id)
+      .leftJoin(
+        'gj_users AS usr',
+        'log.user_id',
+        'usr.id',
+      )
+      .groupBy('log.id', 'usr.id')
+      .orderBy('log.date_created', 'desc')
+  },
+  serializePlantLogs(logs) {
+    return logs.map(this.serializePlantLog)
+  },
+  serializePlantLog(log) {
+    const logTree = new Treeize()
+
+    // Some light hackiness to allow for the fact that `treeize`
+    // only accepts arrays of objects, and we want to use a single
+    // object.
+    const logData = logTree.grow([ log ]).getData()[0]
+
+    return {
+      id: logData.id,
+      image: logData.image,
+      plant_id: logData.plant_id,
+      text: xss(logData.text),
+      user: logData.user || {},
+      date_created: logData.date_created,
+    }
+  },
 
   
 }
+const userFields = [
+  'usr.id AS user:id',
+  'usr.user_name AS user:user_name',
+  'usr.date_created AS user:date_created',
+]
 
 
 

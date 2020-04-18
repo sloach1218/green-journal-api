@@ -62,16 +62,12 @@ plantsRouter
         })
         .catch(next)
     })
+    
 
-plantsRouter
-  .route('/:plant_id')
-  .all(requireAuth)
-  .all(checkPlantExists)
-  .get((req, res) => {
-    res.json(PlantsService.serializePlant(res.plant))
-  }) 
+  
+  
 
-/*
+
 plantsRouter.route('/:plant_id/logs/')
   .all(requireAuth)
   .all(checkPlantExists)
@@ -80,11 +76,11 @@ plantsRouter.route('/:plant_id/logs/')
       req.app.get('db'),
       req.params.plant_id
     )
-      .then(reviews => {
+      .then(logs => {
         res.json(PlantsService.serializePlantLogs(logs))
       })
       .catch(next)
-  }) */
+  }) 
 
 /* async/await syntax for promises */
 async function checkPlantExists(req, res, next) {

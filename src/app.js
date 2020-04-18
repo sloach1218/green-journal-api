@@ -7,6 +7,7 @@ const { NODE_ENV } = require('./config')
 const authRouter = require('../auth/auth-router')
 const plantsRouter = require('./plants/plants-router')
 const usersRouter = require('./users/users-router')
+const logsRouter = require('./logs/logs-router')
 
 const imageUploadRouter = require('./image-uploader/image-upload-router')
 
@@ -23,6 +24,7 @@ app.use('/api', imageUploadRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/plants', plantsRouter)
+app.use('/api/logs', logsRouter)
 
 
 
