@@ -203,7 +203,6 @@ function makeLogsFixtures() {
   const testUsers = makeUsersArray()
   const testPlants = makePlantsArray(testUsers)
   const testLogs = makeLogsArray(testPlants, testUsers)
-  console.log(testLogs)
   return { testLogs, testPlants, testUsers }
 }
 
