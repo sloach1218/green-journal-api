@@ -6,4 +6,5 @@ module.exports = {
     JWT_SECRET: process.env.JWT_SECRET || 'change-this-secret',
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    CLIENT_ORIGIN: process.env.CLIENT_ORIGIN,
   }

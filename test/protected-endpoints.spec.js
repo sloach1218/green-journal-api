@@ -10,7 +10,7 @@ describe('Protected endpoints', function() {
   before('make knex instance', () => {
     db = knex({
       client: 'pg',
-      connection: process.env.TEST_DB_URL,
+      connection: process.env.TEST_DATABASE_URL,
     })
     app.set('db', db)
   })
@@ -30,11 +30,7 @@ describe('Protected endpoints', function() {
         path: '/api/plants',
         method: supertest(app).get,
     },
-    /*{
-      name: 'GET /api/plants/:plants_id',
-      path: '/api/plants/1',
-      method: supertest(app).get,
-    },*/
+    
   ]
 
   protectedEndpoints.forEach(endpoint => {
