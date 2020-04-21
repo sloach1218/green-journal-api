@@ -17,7 +17,7 @@ const app = express()
 app.use(morgan((NODE_ENV === 'production') ? 'tiny' : 'common', {
   skip: () => NODE_ENV === 'test',
 }))
-app.use(cors({origin: CLIENT_ORIGIN}))
+app.use(cors())
 app.use(helmet())
 
 app.use('/api', imageUploadRouter)
