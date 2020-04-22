@@ -15,8 +15,6 @@ usersRouter
           error: `Missing '${field}' in request body`
         })
 
-    
-
     const passwordError = UsersService.validatePassword(password)
 
     if (passwordError)

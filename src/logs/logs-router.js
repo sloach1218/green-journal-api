@@ -12,11 +12,21 @@ logsRouter
     const { plant_id, image, text } = req.body
     const newLog = { plant_id, image, text  }
 
-    for (const [key, value] of Object.entries(newLog))
+
+    const numberOfValues = Object.values(newLog).filter(Boolean).length
+      if (numberOfValues === 0) {
+        return res.status(400).json({
+          error: {
+            message: `Request body must contain either text or image`
+          }
+        })
+      }
+
+    /*for (const [key, value] of Object.entries(newLog))
       if (value == null)
         return res.status(400).json({
           error: `Missing '${key}' in request body`
-        })
+        })*/
     newLog.user_id = req.user.id
 
     LogsService.insertLog(
