@@ -33,7 +33,6 @@ plantsRouter
       .then(plant => {
         res
           .status(201)
-          //.location(path.posix.join(req.originalUrl, `/${plant.id}`))
           .json(PlantsService.serializePlant(plant))
       })
       .catch(next)

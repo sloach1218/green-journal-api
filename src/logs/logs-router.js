@@ -1,5 +1,4 @@
 const express = require('express')
-//const path = require('path')
 const LogsService = require('./logs-service')
 const { requireAuth } = require('../../middleware/jwt-auth')
 
@@ -22,11 +21,6 @@ logsRouter
         })
       }
 
-    /*for (const [key, value] of Object.entries(newLog))
-      if (value == null)
-        return res.status(400).json({
-          error: `Missing '${key}' in request body`
-        })*/
     newLog.user_id = req.user.id
 
     LogsService.insertLog(
@@ -36,7 +30,6 @@ logsRouter
       .then(log => {
         res
           .status(201)
-          //.location(path.posix.join(req.originalUrl, `/${review.id}`))
           .json(LogsService.serializeLog(log))
       })
       .catch(next)

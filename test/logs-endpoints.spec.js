@@ -119,29 +119,7 @@ describe('Log Updates Endpoints', function() {
           expect(res.body).to.have.property('id')
         })
     })
-
-    const requiredFields = ['text', 'image', 'plant_id']
-
-    requiredFields.forEach(field => {
-      
-      const newLog = {
-        text: 'Planty',
-        image: 'plant.jpg',
-        plant_id: '2',
-      }
-
-      it(`responds with 400 and an error message when the '${field}' is missing`, () => {
-        delete newLog[field]
-
-        return supertest(app)
-          .post('/api/logs')
-          .set('Authorization', helpers.makeAuthHeader(validUser))
-          .send(newLog)
-          .expect(400, {
-            error: `Missing '${field}' in request body`,
-          })
-      })
-    })
+    
   })
   
   describe('DELETE /api/logs', () => {

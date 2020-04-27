@@ -41,9 +41,6 @@ const PlantsService = {
   serializePlant(plant) {
     const plantTree = new Treeize()
 
-    // Some light hackiness to allow for the fact that `treeize`
-    // only accepts arrays of objects, and we want to use a single
-    // object.
     const plantData = plantTree.grow([ plant ]).getData()[0]
 
     return {
@@ -111,9 +108,6 @@ const PlantsService = {
   serializePlantLog(log) {
     const logTree = new Treeize()
 
-    // Some light hackiness to allow for the fact that `treeize`
-    // only accepts arrays of objects, and we want to use a single
-    // object.
     const logData = logTree.grow([ log ]).getData()[0]
 
     return {
